@@ -11,7 +11,7 @@ RUN CGO_ENABLED=0 go build -ldflags="-s -w" -o /usr/local/bin/webhook
 
 FROM ubuntu:latest
 COPY --from=builder /usr/local/bin/webhook /usr/local/bin/webhook
-RUN apt-get update && apt-get install -y curl jq tini git gnupg
+RUN apt-get update && apt-get install -y curl jq tini git gnupg bsdmainutils
 
 EXPOSE 9000
 ENTRYPOINT ["/usr/local/bin/webhook"]
