@@ -14,7 +14,7 @@ COPY --from=builder /usr/local/bin/webhook /usr/local/bin/webhook
 RUN apt-get update && apt-get install -y curl jq tini git gnupg
 EXPOSE 9000
 ENTRYPOINT ["/usr/local/bin/webhook"]
-CMD ["-hooks", "/etc/webhook/hooks.json", "-verbose", "-hotreload"]
+CMD ["-hooks", "/etc/webhook/hooks.yaml", "-verbose", "-template", "-hotreload"]
 
 # Install some additional devops tools:
 
