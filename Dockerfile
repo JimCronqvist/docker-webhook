@@ -12,9 +12,23 @@ RUN CGO_ENABLED=0 go build -ldflags="-s -w" -o /usr/local/bin/webhook
 FROM ubuntu:latest
 COPY --from=builder /usr/local/bin/webhook /usr/local/bin/webhook
 RUN apt-get update && apt-get install -y curl jq tini git gnupg
+
+# Add a default health webhook endpoint and a script that returns "OK"
+COPY <<EOF /etc/webhook/health.yaml
+- id: health
+  execute-command: /scripts/health.sh
+  include-command-output-in-response: true
+  incoming-payload-content-type: x-www-form-urlencoded
+EOF
+COPY <<EOF /scripts/health.sh
+#!/bin/sh
+echo OK
+EOF
+RUN chmod +x /scripts/health.sh
+
 EXPOSE 9000
 ENTRYPOINT ["/usr/local/bin/webhook"]
-CMD ["-hooks", "/etc/webhook/hooks.yaml", "-verbose", "-template", "-hotreload"]
+CMD ["-hooks", "/etc/webhook/health.yaml", "-hooks", "/etc/webhook/hooks.yaml",  "-verbose", "-template", "-urlprefix", "", "-hotreload"]
 
 # Install some additional devops tools:
 
